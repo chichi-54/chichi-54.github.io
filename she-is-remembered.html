@@ -1,0 +1,1744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>SHE IS REMEMBERED</title>
+
+    <!-- ═══════════ TYPOGRAPHY ═══════════ -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --font-narrative: 'IM Fell English', 'Georgia', 'Palatino Linotype', 'Book Antiqua', serif;
+            --font-display: 'IM Fell English SC', 'Georgia', 'Times New Roman', serif;
+            --font-mono: 'Courier Prime', 'SF Mono', 'Consolas', 'Liberation Mono', monospace;
+            --font-label: 'IM Fell English', 'Georgia', serif;
+
+            --bg-void: #04040c;
+            --bg-betrothal: #0e0b07;
+            --bg-escape: #05071c;
+            --bg-curse: #070913;
+            --bg-warmth: #0d0a05;
+            --bg-clinical: #eae7e1;
+            --bg-epilogue: #0b0b17;
+            --bg-museum: #0c0a06;
+
+            --text-narrative: #dbd0b8;
+            --text-luc: #c4cddb;
+            --text-clinical: #1a1a1e;
+            --text-epilogue: #d2cab8;
+            --text-label: #d8ceb4;
+
+            --gold: #c8a860;
+            --gold-dim: #a08848;
+            --gold-pale: #d4c090;
+            --ink: #1a1814;
+            --parchment: #e8e0d0;
+
+            --transition-slow: 2.2s;
+            --transition-med: 1.1s;
+            --transition-fast: 0.65s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #02020a;
+            font-family: var(--font-narrative);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            user-select: none;
+            -webkit-user-select: none;
+            cursor: default;
+        }
+
+        /* ── ATMOSPHERE LAYER ── */
+        #atmosphere {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.3;
+            background:
+                radial-gradient(ellipse at 50% 35%, rgba(180, 150, 100, 0.05) 0%, transparent 65%),
+                radial-gradient(ellipse at 28% 68%, rgba(100, 120, 160, 0.035) 0%, transparent 55%),
+                radial-gradient(ellipse at 72% 18%, rgba(160, 140, 100, 0.025) 0%, transparent 50%);
+            transition: opacity 3.2s ease;
+        }
+
+        /* ── VIGNETTE ── */
+        #vignette {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 99;
+            background: radial-gradient(ellipse at center, transparent 46%, rgba(1, 1, 10, 0.8) 100%);
+            transition: opacity var(--transition-slow) ease;
+        }
+
+        /* ── FADE OVERLAY ── */
+        #fade-overlay {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 200;
+            background: #010108;
+            opacity: 0;
+            transition: opacity var(--transition-med) ease;
+        }
+        #fade-overlay.active {
+            opacity: 1;
+        }
+
+        /* ── INK-SPLATTER TEXTURE (subtle) ── */
+        #ink-texture {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0.04;
+            background:
+                radial-gradient(ellipse at 18% 22%, rgba(80, 60, 30, 0.6) 0%, transparent 40%),
+                radial-gradient(ellipse at 82% 75%, rgba(60, 45, 25, 0.5) 0%, transparent 35%),
+                radial-gradient(ellipse at 45% 55%, rgba(70, 50, 30, 0.4) 0%, transparent 30%);
+            transition: opacity 4s ease;
+        }
+
+        /* ── MAIN CONTAINER ── */
+        #main-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-void);
+            transition: background var(--transition-slow) ease;
+            overflow: hidden;
+            z-index: 2;
+        }
+
+        /* ── PHASE BASE ── */
+        .phase {
+            position: absolute;
+            width: 100%;
+            max-width: 700px;
+            padding: 2rem 2.5rem;
+            text-align: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity var(--transition-fast) ease;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.3rem;
+        }
+        .phase.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .phase.fading-out {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+        /* ── NARRATIVE LINES ── */
+        .narrative-line {
+            font-family: var(--font-narrative);
+            font-size: 1.3rem;
+            line-height: 1.75;
+            color: var(--text-narrative);
+            letter-spacing: 0.025em;
+            opacity: 0;
+            transform: translateY(12px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+            font-style: italic;
+            text-shadow: 0 0 55px rgba(200, 175, 135, 0.1);
+            max-width: 570px;
+        }
+        .narrative-line.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .narrative-line.emphasis {
+            font-style: normal;
+            font-size: 1.45rem;
+            letter-spacing: 0.04em;
+            text-shadow: 0 0 65px rgba(210, 180, 140, 0.18);
+            color: #e6d9bf;
+            font-variant: small-caps;
+            font-family: var(--font-display);
+        }
+
+        /* ── CONTINUE HINT ── */
+        .continue-hint {
+            font-family: var(--font-display);
+            font-size: 0.65rem;
+            color: rgba(200, 180, 150, 0.32);
+            letter-spacing: 0.14em;
+            opacity: 0;
+            transition: opacity 1.2s ease;
+            margin-top: 0.3rem;
+        }
+        .continue-hint.show {
+            opacity: 0.55;
+            animation: hintPulse 3.8s ease-in-out infinite;
+        }
+        @keyframes hintPulse {
+            0%,
+            100% {
+                opacity: 0.25;
+            }
+            50% {
+                opacity: 0.65;
+            }
+        }
+
+        /* ── DIALOGUE ── */
+        .dialogue-line {
+            font-family: var(--font-narrative);
+            font-size: 1.2rem;
+            line-height: 1.65;
+            letter-spacing: 0.02em;
+            opacity: 0;
+            transform: translateY(8px);
+            transition: opacity 0.75s ease, transform 0.75s ease;
+            max-width: 540px;
+        }
+        .dialogue-line.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .dialogue-line.addie {
+            color: var(--text-narrative);
+            font-style: italic;
+            text-shadow: 0 0 32px rgba(190, 160, 120, 0.1);
+        }
+        .dialogue-line.luc {
+            color: var(--text-luc);
+            font-style: normal;
+            letter-spacing: 0.035em;
+            text-shadow: 0 0 28px rgba(150, 170, 200, 0.07);
+            font-family: var(--font-display);
+            font-size: 1.15rem;
+        }
+        .dialogue-line.luc-warm {
+            color: #d8cebc;
+            text-shadow: 0 0 38px rgba(200, 175, 140, 0.12);
+        }
+        .dialogue-line.luc-cold {
+            color: #bcc4d4;
+            text-shadow: 0 0 20px rgba(140, 155, 185, 0.06);
+        }
+        .dialogue-line.luc-intimate {
+            color: #d4c8b8;
+            text-shadow: 0 0 42px rgba(200, 170, 135, 0.15);
+            font-style: italic;
+            font-family: var(--font-narrative);
+        }
+
+        /* ── CHOICE UI ── */
+        .choice-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.7rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.8s ease;
+            margin-top: 0.5rem;
+        }
+        .choice-container.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .choice-prompt {
+            font-family: var(--font-display);
+            font-size: 0.78rem;
+            color: rgba(200, 180, 155, 0.5);
+            letter-spacing: 0.07em;
+            margin-bottom: 0.1rem;
+        }
+        .choice-btn {
+            font-family: var(--font-narrative);
+            font-size: 1rem;
+            letter-spacing: 0.06em;
+            padding: 0.7rem 1.8rem;
+            border: 1px solid rgba(200, 170, 130, 0.25);
+            background: transparent;
+            color: var(--text-narrative);
+            cursor: pointer;
+            transition: all 0.5s ease;
+            min-width: 200px;
+            text-align: center;
+            position: relative;
+        }
+        .choice-btn:hover {
+            border-color: rgba(200, 170, 130, 0.6);
+            background: rgba(200, 170, 130, 0.04);
+            text-shadow: 0 0 32px rgba(200, 170, 130, 0.3);
+            box-shadow: 0 0 55px rgba(180, 140, 100, 0.05);
+            letter-spacing: 0.1em;
+        }
+        .choice-btn.resistance-btn {
+            border-color: rgba(180, 150, 160, 0.28);
+            color: #d4c8c0;
+        }
+        .choice-btn.reflection-btn {
+            border-color: rgba(160, 170, 190, 0.28);
+            color: #c8cdd6;
+        }
+        .choice-btn.surrender-btn {
+            border-color: rgba(190, 160, 130, 0.3);
+            color: #ddd2be;
+        }
+
+        /* ── RESOLUTION ── */
+        .resolution-text {
+            font-family: var(--font-narrative);
+            font-size: 1.45rem;
+            line-height: 1.7;
+            color: #e8d8b8;
+            letter-spacing: 0.035em;
+            opacity: 0;
+            transition: opacity 1.3s ease;
+            text-shadow: 0 0 65px rgba(220, 190, 140, 0.3);
+            font-style: italic;
+        }
+        .resolution-text.visible {
+            opacity: 1;
+        }
+
+        /* ── CONTRADICTION ── */
+        .contradiction-text {
+            font-family: var(--font-mono);
+            font-size: 0.92rem;
+            color: var(--text-clinical);
+            letter-spacing: 0.05em;
+            opacity: 0;
+            transition: opacity 1s ease;
+            line-height: 1.6;
+        }
+        .contradiction-text.visible {
+            opacity: 0.76;
+        }
+        .contradiction-sub {
+            font-family: var(--font-mono);
+            font-size: 0.6rem;
+            color: rgba(30, 30, 38, 0.38);
+            letter-spacing: 0.1em;
+            opacity: 0;
+            transition: opacity 1.2s ease 0.6s;
+        }
+        .contradiction-sub.visible {
+            opacity: 0.42;
+        }
+        .glitch-flicker {
+            animation: subtleFlicker 5s ease-in-out infinite;
+        }
+        @keyframes subtleFlicker {
+            0%,
+            94%,
+            100% {
+                opacity: 0.76;
+            }
+            94.5% {
+                opacity: 0.5;
+            }
+            95% {
+                opacity: 0.82;
+            }
+            95.5% {
+                opacity: 0.55;
+            }
+            96% {
+                opacity: 0.76;
+            }
+        }
+
+        /* ── HIDDEN FRAGMENT (clickable) ── */
+        .hidden-fragment {
+            position: fixed;
+            z-index: 50;
+            pointer-events: auto;
+            cursor: pointer;
+            opacity: 0.28;
+            transition: opacity 0.7s ease, transform 0.7s ease;
+            animation: fragmentGlow 5s ease-in-out infinite;
+        }
+        .hidden-fragment:hover {
+            opacity: 0.75;
+            transform: scale(1.12);
+        }
+        .hidden-fragment.collected {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+        @keyframes fragmentGlow {
+            0%,
+            100% {
+                opacity: 0.22;
+            }
+            50% {
+                opacity: 0.4;
+            }
+        }
+        .fragment-icon {
+            font-size: 2.2rem;
+            filter: drop-shadow(0 0 15px rgba(200, 170, 130, 0.35));
+            display: block;
+            text-align: center;
+        }
+        .fragment-tooltip {
+            font-family: var(--font-narrative);
+            font-size: 0.65rem;
+            color: rgba(200, 180, 150, 0.6);
+            font-style: italic;
+            text-align: center;
+            letter-spacing: 0.04em;
+            margin-top: -3px;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        .hidden-fragment:hover .fragment-tooltip {
+            opacity: 1;
+        }
+
+        /* ── EPILOGUE SEARCH ── */
+        #epilogue .search-label {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            color: var(--text-epilogue);
+            letter-spacing: 0.06em;
+            font-style: normal;
+            opacity: 0;
+            transition: opacity 1s ease;
+            text-shadow: 0 0 38px rgba(200, 180, 150, 0.13);
+        }
+        #epilogue .search-label.visible {
+            opacity: 1;
+        }
+        #epilogue .search-wrapper {
+            opacity: 0;
+            transition: opacity 1s ease 0.5s;
+            width: 100%;
+            max-width: 420px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.7rem;
+        }
+        #epilogue .search-wrapper.visible {
+            opacity: 1;
+        }
+        #epilogue .search-input {
+            width: 100%;
+            padding: 0.8rem 1.3rem;
+            font-family: var(--font-mono);
+            font-size: 0.95rem;
+            letter-spacing: 0.05em;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid rgba(200, 180, 150, 0.28);
+            color: var(--text-epilogue);
+            text-align: center;
+            outline: none;
+            transition: border-color 0.6s ease, box-shadow 0.6s ease;
+            caret-color: rgba(200, 170, 130, 0.6);
+        }
+        #epilogue .search-input::placeholder {
+            color: rgba(180, 165, 140, 0.22);
+            font-style: italic;
+            font-family: var(--font-mono);
+        }
+        #epilogue .search-input:focus {
+            border-bottom-color: rgba(200, 170, 130, 0.6);
+            box-shadow: 0 8px 30px -10px rgba(180, 150, 110, 0.08);
+        }
+        #epilogue .search-result {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            letter-spacing: 0.03em;
+            opacity: 0;
+            transition: opacity 0.7s ease;
+            max-width: 400px;
+            line-height: 1.6;
+        }
+        #epilogue .search-result.visible {
+            opacity: 1;
+        }
+        #epilogue .search-result.no-result {
+            color: rgba(180, 170, 155, 0.42);
+            font-style: italic;
+        }
+        #epilogue .search-result.found {
+            color: #d4c4a8;
+        }
+        #epilogue .result-card {
+            border: 1px solid rgba(200, 170, 130, 0.18);
+            padding: 1rem 1.5rem;
+            background: rgba(200, 170, 130, 0.02);
+            text-align: left;
+            width: 100%;
+            max-width: 380px;
+        }
+        #epilogue .result-card .result-name {
+            font-family: var(--font-display);
+            font-size: 1.05rem;
+            color: #d8c8a8;
+            letter-spacing: 0.06em;
+            margin-bottom: 0.2rem;
+        }
+        #epilogue .result-card .result-status {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: rgba(200, 180, 150, 0.48);
+            letter-spacing: 0.07em;
+            margin-bottom: 0.5rem;
+        }
+        #epilogue .result-card .result-line {
+            font-family: var(--font-narrative);
+            font-size: 0.85rem;
+            color: rgba(210, 195, 165, 0.6);
+            font-style: italic;
+        }
+        #epilogue .sync-line {
+            font-family: var(--font-mono);
+            font-size: 0.58rem;
+            color: rgba(180, 170, 150, 0.28);
+            letter-spacing: 0.08em;
+            opacity: 0;
+            transition: opacity 1.4s ease 1s;
+        }
+        #epilogue .sync-line.visible {
+            opacity: 0.38;
+        }
+        #epilogue .museum-link {
+            font-family: var(--font-display);
+            font-size: 0.7rem;
+            color: rgba(200, 180, 150, 0.45);
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 1.2s ease 2s;
+            text-decoration: none;
+            border-bottom: 1px dotted rgba(200, 180, 150, 0.25);
+            padding-bottom: 2px;
+        }
+        #epilogue .museum-link.visible {
+            opacity: 0.6;
+        }
+        #epilogue .museum-link:hover {
+            opacity: 0.9;
+            color: var(--gold-pale);
+        }
+
+        /* ── MEMORY MUSEUM ── */
+        #museum-phase {
+            position: absolute;
+            width: 100%;
+            height: 100vh;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 15;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            overflow-y: auto;
+            padding: 2.5rem 1.5rem 4rem;
+            transition: opacity 1s ease;
+            gap: 1.8rem;
+        }
+        #museum-phase.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        #museum-phase .museum-title {
+            font-family: var(--font-display);
+            font-size: 1.6rem;
+            color: #d8ceb4;
+            letter-spacing: 0.08em;
+            text-shadow: 0 0 50px rgba(200, 170, 130, 0.2);
+            margin-bottom: 0.3rem;
+        }
+        #museum-phase .museum-subtitle {
+            font-family: var(--font-narrative);
+            font-size: 0.85rem;
+            color: rgba(200, 180, 150, 0.45);
+            font-style: italic;
+            letter-spacing: 0.04em;
+            margin-bottom: 0.5rem;
+        }
+        #museum-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.2rem;
+            justify-content: center;
+            max-width: 620px;
+        }
+        .museum-artifact {
+            width: 110px;
+            height: 140px;
+            border: 1px solid rgba(200, 170, 130, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.5s ease;
+            position: relative;
+            background: rgba(200, 170, 130, 0.015);
+            gap: 0.3rem;
+            padding: 0.6rem;
+        }
+        .museum-artifact:hover {
+            border-color: rgba(200, 170, 130, 0.55);
+            background: rgba(200, 170, 130, 0.05);
+            box-shadow: 0 0 45px rgba(180, 140, 100, 0.08);
+        }
+        .museum-artifact .artifact-emoji {
+            font-size: 2.8rem;
+            filter: drop-shadow(0 0 20px rgba(200, 170, 130, 0.18));
+        }
+        .museum-artifact .artifact-name {
+            font-family: var(--font-display);
+            font-size: 0.6rem;
+            color: rgba(200, 180, 150, 0.55);
+            letter-spacing: 0.06em;
+            text-align: center;
+        }
+        .museum-artifact.locked {
+            opacity: 0.3;
+            cursor: default;
+            filter: grayscale(0.6);
+        }
+        .museum-artifact.locked:hover {
+            border-color: rgba(200, 170, 130, 0.15);
+            background: transparent;
+            box-shadow: none;
+        }
+
+        /* ── ARTIFACT DETAIL OVERLAY ── */
+        #artifact-detail-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 300;
+            background: rgba(4, 3, 8, 0.88);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.6s ease;
+        }
+        #artifact-detail-overlay.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        #artifact-detail-card {
+            background: #0e0c07;
+            border: 1px solid rgba(200, 170, 130, 0.3);
+            padding: 2rem 2.2rem;
+            max-width: 520px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            text-align: left;
+            box-shadow: 0 0 80px rgba(180, 140, 100, 0.1);
+        }
+        #artifact-detail-card .detail-emoji {
+            font-size: 3.5rem;
+            text-align: center;
+            margin-bottom: 0.8rem;
+        }
+        #artifact-detail-card .detail-title {
+            font-family: var(--font-display);
+            font-size: 1.3rem;
+            color: #d8ceb4;
+            letter-spacing: 0.06em;
+            text-align: center;
+            margin-bottom: 0.3rem;
+        }
+        #artifact-detail-card .detail-creator {
+            font-family: var(--font-narrative);
+            font-size: 0.75rem;
+            color: rgba(200, 180, 150, 0.4);
+            font-style: italic;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        #artifact-detail-card .detail-description {
+            font-family: var(--font-label);
+            font-size: 0.95rem;
+            color: #d0c4aa;
+            line-height: 1.7;
+            letter-spacing: 0.02em;
+            font-style: italic;
+        }
+        #artifact-detail-card .detail-description strong {
+            font-family: var(--font-display);
+            font-weight: normal;
+            color: #e0d4b8;
+            letter-spacing: 0.04em;
+            font-style: normal;
+        }
+        #artifact-detail-card .close-detail {
+            font-family: var(--font-display);
+            font-size: 0.7rem;
+            color: rgba(200, 180, 150, 0.5);
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            text-align: center;
+            margin-top: 1.2rem;
+            transition: color 0.4s ease;
+        }
+        #artifact-detail-card .close-detail:hover {
+            color: var(--gold-pale);
+        }
+
+        /* ── COLLECTION TOAST ── */
+        #collection-toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 250;
+            font-family: var(--font-display);
+            font-size: 0.7rem;
+            color: #d8ceb4;
+            letter-spacing: 0.08em;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            text-shadow: 0 0 25px rgba(200, 170, 130, 0.35);
+            background: rgba(8, 7, 4, 0.75);
+            padding: 0.5rem 1.2rem;
+            border: 1px solid rgba(200, 170, 130, 0.2);
+        }
+        #collection-toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-6px);
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 600px) {
+            .phase {
+                padding: 1.3rem 0.9rem;
+                gap: 1rem;
+                max-width: 100%;
+            }
+            .narrative-line {
+                font-size: 1.05rem;
+                line-height: 1.55;
+            }
+            .narrative-line.emphasis {
+                font-size: 1.15rem;
+            }
+            .dialogue-line {
+                font-size: 1rem;
+                line-height: 1.45;
+            }
+            .dialogue-line.luc {
+                font-size: 0.95rem;
+            }
+            .choice-btn {
+                font-size: 0.9rem;
+                padding: 0.6rem 1.3rem;
+                min-width: 150px;
+            }
+            .resolution-text {
+                font-size: 1.1rem;
+            }
+            #epilogue .search-label {
+                font-size: 1.2rem;
+            }
+            .museum-artifact {
+                width: 85px;
+                height: 115px;
+                padding: 0.4rem;
+            }
+            .museum-artifact .artifact-emoji {
+                font-size: 2.2rem;
+            }
+            #museum-grid {
+                gap: 0.8rem;
+            }
+            .hidden-fragment .fragment-icon {
+                font-size: 1.6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="atmosphere"></div>
+    <div id="ink-texture"></div>
+    <div id="vignette"></div>
+    <div id="fade-overlay"></div>
+    <div id="collection-toast"></div>
+
+    <!-- ═══════════ HIDDEN FRAGMENTS (clickable during Acts I-IV) ═══════════ -->
+    <div class="hidden-fragment" id="fragment-letter" style="top:18%;right:8%;" data-fragment="folded-letter">
+        <span class="fragment-icon">✉️</span>
+        <span class="fragment-tooltip">folded letter</span>
+    </div>
+    <div class="hidden-fragment" id="fragment-moth" style="top:55%;left:6%;" data-fragment="moth">
+        <span class="fragment-icon">🦋</span>
+        <span class="fragment-tooltip">a moth circling</span>
+    </div>
+    <div class="hidden-fragment" id="fragment-feather" style="top:32%;right:12%;" data-fragment="bird-feather">
+        <span class="fragment-icon">🪶</span>
+        <span class="fragment-tooltip">bird feather</span>
+    </div>
+    <div class="hidden-fragment" id="fragment-flower" style="top:70%;left:10%;" data-fragment="pressed-flower">
+        <span class="fragment-icon">🥀</span>
+        <span class="fragment-tooltip">pressed flower</span>
+    </div>
+    <div class="hidden-fragment" id="fragment-candle" style="top:45%;right:18%;" data-fragment="candle-stub">
+        <span class="fragment-icon">🕯️</span>
+        <span class="fragment-tooltip">candle stub</span>
+    </div>
+
+    <!-- ═══════════ MAIN CONTAINER ═══════════ -->
+    <div id="main-container">
+
+        <!-- ACT I — THE LIFE SHE ESCAPES -->
+        <div class="phase" id="phase-act1">
+            <div class="narrative-line" data-index="0">She was born into a life already written for her.</div>
+            <div class="narrative-line" data-index="1">A betrothal arranged before she could speak her own desires.</div>
+            <div class="narrative-line" data-index="2">The weight of expectation pressed against her ribs each morning.</div>
+            <div class="narrative-line emphasis" data-index="3">She was seen by everyone — and known by no one.</div>
+            <div class="narrative-line" data-index="4">Her family spoke of duty. Of honor. Of tradition.</div>
+            <div class="narrative-line" data-index="5">But never of what she wanted.</div>
+            <div class="narrative-line emphasis" data-index="6">In a house full of people who claimed to love her, she had never felt more invisible.</div>
+            <div class="narrative-line" data-index="7">The wedding date drew closer like a closing door.</div>
+            <div class="narrative-line" data-index="8">And so, on the night before her betrothal ceremony…</div>
+            <div class="narrative-line emphasis" data-index="9">She ran.</div>
+            <div class="continue-hint" id="hint-act1">click or press any key to continue</div>
+        </div>
+
+        <!-- ACT II — THE NIGHT SHE RUNS -->
+        <div class="phase" id="phase-act2">
+            <div class="narrative-line" data-index="0">The night swallowed her whole.</div>
+            <div class="narrative-line" data-index="1">Wind tore through the trees. The world blurred past her.</div>
+            <div class="narrative-line" data-index="2">She did not know where she was going — only what she was leaving.</div>
+            <div class="narrative-line emphasis" data-index="3">And then the darkness shifted.</div>
+            <div class="narrative-line" data-index="4">Not a sound. Not a movement. A presence.</div>
+            <div class="dialogue-line luc" data-index="5">&ldquo;You are running from a life you never chose.&rdquo;</div>
+            <div class="dialogue-line addie" data-index="6">&ldquo;Who are you?&rdquo;</div>
+            <div class="dialogue-line luc" data-index="7">&ldquo;Someone who sees you. Truly sees you.&rdquo;</div>
+            <div class="dialogue-line luc" data-index="8">&ldquo;No one will hold your life for you. But I can make sure no one ever claims it either.&rdquo;</div>
+            <div class="dialogue-line addie" data-index="9">&ldquo;What does that mean?&rdquo;</div>
+            <div class="dialogue-line luc" data-index="10">&ldquo;Freedom. At a cost you will not understand until it is too late.&rdquo;</div>
+            <div class="dialogue-line addie" data-index="11">&ldquo;I don&rsquo;t care. I cannot go back.&rdquo;</div>
+            <div class="dialogue-line luc" data-index="12">&ldquo;Then it is done.&rdquo;</div>
+            <div class="continue-hint" id="hint-act2">click or press any key to continue</div>
+        </div>
+
+        <!-- ACT III — THE CURSE + INTERACTIVE DIALOGUE -->
+        <div class="phase" id="phase-act3">
+            <div class="narrative-line" data-index="0">At first, she did not notice.</div>
+            <div class="narrative-line" data-index="1">A shopkeeper who should have remembered her — did not.</div>
+            <div class="narrative-line" data-index="2">A friend she had laughed with the day before — blank eyes.</div>
+            <div class="narrative-line emphasis" data-index="3">She left no imprint. No trace. No memory.</div>
+            <div class="narrative-line" data-index="4">The world experienced her — and then released her instantly.</div>
+            <div class="narrative-line" data-index="5">Days became years. Years became decades.</div>
+            <div class="narrative-line emphasis" data-index="6">She was the most witnessed person alive — and the most forgotten.</div>
+            <div id="dialogue-moment-1" style="display:none;flex-direction:column;align-items:center;gap:0.8rem;width:100%;">
+                <div class="dialogue-line luc" id="dm1-luc-line">&ldquo;You asked to be free.&rdquo;</div>
+                <div class="choice-container" id="dm1-choices">
+                    <div class="choice-prompt">How do you respond?</div>
+                    <button class="choice-btn resistance-btn" data-choice="resistance">I didn&rsquo;t ask for this kind of freedom.</button>
+                    <button class="choice-btn reflection-btn" data-choice="reflection">Was I ever truly free before this?</button>
+                    <button class="choice-btn surrender-btn" data-choice="surrender">Then I will learn to live with it.</button>
+                </div>
+                <div class="dialogue-line luc" id="dm1-luc-response" style="display:none;"></div>
+            </div>
+            <div class="narrative-line" data-index="7">She drifted through cities, through lives, through centuries.</div>
+            <div class="narrative-line" data-index="8">Each encounter a fleeting brush against a world that could not hold her.</div>
+            <div class="narrative-line" data-index="9">Luc appeared at the edges of her existence — never summoned, never absent for long.</div>
+            <div id="dialogue-moment-2" style="display:none;flex-direction:column;align-items:center;gap:0.8rem;width:100%;">
+                <div class="dialogue-line luc" id="dm2-luc-line">&ldquo;You confuse being unseen with being unloved.&rdquo;</div>
+                <div class="choice-container" id="dm2-choices">
+                    <div class="choice-prompt">How do you respond?</div>
+                    <button class="choice-btn resistance-btn" data-choice="resistance">You don&rsquo;t get to define what I feel.</button>
+                    <button class="choice-btn reflection-btn" data-choice="reflection">Is there a difference, after all this time?</button>
+                    <button class="choice-btn surrender-btn" data-choice="surrender">Then tell me — have you ever loved what you&rsquo;ve seen?</button>
+                </div>
+                <div class="dialogue-line luc" id="dm2-luc-response" style="display:none;"></div>
+            </div>
+            <div class="narrative-line" data-index="10">The isolation did not soften. But something in her did.</div>
+            <div class="narrative-line emphasis" data-index="11">She began to understand: Luc was the only constant witness to her existence.</div>
+            <div class="narrative-line" data-index="12">And then, one night unlike any other, he came with something new.</div>
+            <div class="continue-hint" id="hint-act3">click or press any key to continue</div>
+        </div>
+
+        <!-- ACT IV — THE POSSIBILITY -->
+        <div class="phase" id="phase-act4">
+            <div class="dialogue-line luc" data-index="0">&ldquo;I can let them remember you.&rdquo;</div>
+            <div class="dialogue-line addie" data-index="1">&ldquo;For how long?&rdquo;</div>
+            <div class="dialogue-line luc luc-warm" data-index="2">&ldquo;Long enough to know what it feels like to be held by the world.&rdquo;</div>
+            <div class="dialogue-line addie" data-index="3">&ldquo;And the cost?&rdquo;</div>
+            <div class="dialogue-line luc luc-intimate" data-index="4">&ldquo;The same as always. Everything that forgets you — including this moment, when it passes.&rdquo;</div>
+            <div class="dialogue-line addie" data-index="5">&ldquo;Then let them remember.&rdquo;</div>
+            <div class="resolution-text" id="resolution-text">Her name is spoken. And this time, it stays.</div>
+        </div>
+
+        <!-- ACT V — CONTRADICTION -->
+        <div class="phase" id="phase-act5">
+            <div class="contradiction-text glitch-flicker" id="contradiction-text">No record exists for: Addie LaRue.</div>
+            <div class="contradiction-sub" id="contradiction-sub">all references return null</div>
+        </div>
+
+        <!-- EPILOGUE — SEARCH -->
+        <div class="phase" id="phase-epilogue">
+            <div class="search-label" id="search-label">Who are you?</div>
+            <div class="search-wrapper" id="search-wrapper">
+                <input type="text" class="search-input" id="search-input" placeholder="Search a name…" autocomplete="off" spellcheck="false">
+                <div class="search-result" id="search-result"></div>
+                <div class="sync-line" id="sync-line"></div>
+                <div class="museum-link" id="museum-link">▸ Enter the Memory Museum</div>
+            </div>
+        </div>
+
+        <!-- ═══════════ MEMORY MUSEUM ═══════════ -->
+        <div id="museum-phase">
+            <div class="museum-title">MEMORY MUSEUM</div>
+            <div class="museum-subtitle">artifacts recovered from the life of Addie LaRue</div>
+            <div id="museum-grid"></div>
+            <div class="museum-link" id="return-from-museum" style="opacity:0.55;cursor:pointer;">▸ Return to Search</div>
+        </div>
+
+    </div>
+
+    <!-- ARTIFACT DETAIL OVERLAY -->
+    <div id="artifact-detail-overlay">
+        <div id="artifact-detail-card">
+            <div class="detail-emoji" id="detail-emoji"></div>
+            <div class="detail-title" id="detail-title"></div>
+            <div class="detail-creator" id="detail-creator"></div>
+            <div class="detail-description" id="detail-description"></div>
+            <div class="close-detail" id="close-detail">Close</div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // ═══════════ GLOBAL STATE ═══════════
+            const state = {
+                currentPhase: 'phase-act1',
+                subIndex: 0,
+                emotionalTone: [], // 'resistance' | 'reflection' | 'surrender'
+                collectedFragments: [], // names of fragments collected
+                storyComplete: false,
+                searchUsed: false,
+                isTransitioning: false,
+                // ACT III
+                act3Stage: 'narrative1',
+                act3LinesShown: 0,
+                dm1Resolved: false,
+                dm2Resolved: false,
+                // Museum
+                museumOpen: false,
+            };
+
+            // ── DOM REFS ──
+            const mainContainer = document.getElementById('main-container');
+            const fadeOverlay = document.getElementById('fade-overlay');
+            const vignette = document.getElementById('vignette');
+            const atmosphere = document.getElementById('atmosphere');
+            const inkTexture = document.getElementById('ink-texture');
+            const collectionToast = document.getElementById('collection-toast');
+
+            const phaseAct1 = document.getElementById('phase-act1');
+            const phaseAct2 = document.getElementById('phase-act2');
+            const phaseAct3 = document.getElementById('phase-act3');
+            const phaseAct4 = document.getElementById('phase-act4');
+            const phaseAct5 = document.getElementById('phase-act5');
+            const phaseEpilogue = document.getElementById('phase-epilogue');
+            const museumPhase = document.getElementById('museum-phase');
+            const allStoryPhases = [phaseAct1, phaseAct2, phaseAct3, phaseAct4, phaseAct5, phaseEpilogue];
+
+            // ACT I
+            const act1Lines = phaseAct1.querySelectorAll('.narrative-line');
+            const hintAct1 = document.getElementById('hint-act1');
+            const totalAct1Lines = 10;
+
+            // ACT II
+            const act2Elements = phaseAct2.querySelectorAll('.narrative-line, .dialogue-line');
+            const hintAct2 = document.getElementById('hint-act2');
+            const totalAct2Elements = 13;
+
+            // ACT III
+            const act3NarrativeLines = phaseAct3.querySelectorAll('.narrative-line');
+            const hintAct3 = document.getElementById('hint-act3');
+            const dm1Container = document.getElementById('dialogue-moment-1');
+            const dm1LucLine = document.getElementById('dm1-luc-line');
+            const dm1Choices = document.getElementById('dm1-choices');
+            const dm1LucResponse = document.getElementById('dm1-luc-response');
+            const dm2Container = document.getElementById('dialogue-moment-2');
+            const dm2LucLine = document.getElementById('dm2-luc-line');
+            const dm2Choices = document.getElementById('dm2-choices');
+            const dm2LucResponse = document.getElementById('dm2-luc-response');
+            const act3NarrativeCount = 13;
+
+            // ACT IV
+            const act4Elements = phaseAct4.querySelectorAll('.dialogue-line');
+            const resolutionText = document.getElementById('resolution-text');
+            const totalAct4Elements = 6;
+
+            // ACT V
+            const contradictionText = document.getElementById('contradiction-text');
+            const contradictionSub = document.getElementById('contradiction-sub');
+
+            // Epilogue
+            const searchLabel = document.getElementById('search-label');
+            const searchWrapper = document.getElementById('search-wrapper');
+            const searchInput = document.getElementById('search-input');
+            const searchResult = document.getElementById('search-result');
+            const syncLine = document.getElementById('sync-line');
+            const museumLink = document.getElementById('museum-link');
+
+            // Museum
+            const museumGrid = document.getElementById('museum-grid');
+            const artifactDetailOverlay = document.getElementById('artifact-detail-overlay');
+            const detailEmoji = document.getElementById('detail-emoji');
+            const detailTitle = document.getElementById('detail-title');
+            const detailCreator = document.getElementById('detail-creator');
+            const detailDescription = document.getElementById('detail-description');
+            const closeDetailBtn = document.getElementById('close-detail');
+            const returnFromMuseum = document.getElementById('return-from-museum');
+
+            // Hidden fragments
+            const allFragmentEls = document.querySelectorAll('.hidden-fragment');
+
+            // ── FADE HELPERS ──
+            async function fadeToBlack(duration = 900) {
+                fadeOverlay.style.transition = `opacity ${duration}ms ease`;
+                fadeOverlay.classList.add('active');
+                return new Promise(r => setTimeout(r, duration));
+            }
+            async function fadeFromBlack(duration = 1100) {
+                fadeOverlay.style.transition = `opacity ${duration}ms ease`;
+                fadeOverlay.classList.remove('active');
+                return new Promise(r => setTimeout(r, duration));
+            }
+
+            function deactivateStoryPhases() {
+                allStoryPhases.forEach(p => { p.classList.remove('active');
+                    p.classList.add('fading-out'); });
+                setTimeout(() => allStoryPhases.forEach(p => p.classList.remove('fading-out')), 500);
+            }
+
+            function activatePhase(phaseEl) {
+                deactivateStoryPhases();
+                museumPhase.classList.remove('active');
+                state.museumOpen = false;
+                setTimeout(() => {
+                    phaseEl.classList.add('active');
+                    state.currentPhase = phaseEl.id;
+                }, 120);
+            }
+
+            function setBackground(color, vignetteOp = 1, atmosphereOp = 0.3, inkOp = 0.04) {
+                mainContainer.style.transition = 'background 2.2s ease';
+                mainContainer.style.background = color;
+                vignette.style.transition = 'opacity 2.2s ease';
+                vignette.style.opacity = vignetteOp;
+                atmosphere.style.transition = 'opacity 2.2s ease';
+                atmosphere.style.opacity = atmosphereOp;
+                inkTexture.style.transition = 'opacity 4s ease';
+                inkTexture.style.opacity = inkOp;
+            }
+
+            // ── HIDDEN FRAGMENT SYSTEM ──
+            function showFragmentElsForPhase(phaseId) {
+                allFragmentEls.forEach(el => {
+                    el.style.display = 'none';
+                    el.classList.remove('collected');
+                });
+                const phaseMap = {
+                    'phase-act1': ['fragment-letter'],
+                    'phase-act2': ['fragment-flower', 'fragment-moth'],
+                    'phase-act3': ['fragment-feather', 'fragment-candle', 'fragment-moth'],
+                    'phase-act4': ['fragment-candle'],
+                };
+                const fragmentIds = phaseMap[phaseId] || [];
+                fragmentIds.forEach(fid => {
+                    const el = document.getElementById('fragment-' + fid.replace('fragment-', ''));
+                    if (!el) {
+                        const byData = document.querySelector(`.hidden-fragment[data-fragment="${fid}"]`);
+                        if (byData && !state.collectedFragments.includes(fid)) {
+                            byData.style.display = 'block';
+                            byData.classList.remove('collected');
+                        }
+                        return;
+                    }
+                    if (!state.collectedFragments.includes(fid)) {
+                        el.style.display = 'block';
+                        el.classList.remove('collected');
+                    }
+                });
+                // Also show any fragment whose data-fragment matches
+                allFragmentEls.forEach(el => {
+                    const df = el.dataset.fragment;
+                    if (fragmentIds.includes(df) && !state.collectedFragments.includes(df)) {
+                        el.style.display = 'block';
+                        el.classList.remove('collected');
+                    }
+                });
+            }
+
+            function collectFragment(fragmentName) {
+                if (state.collectedFragments.includes(fragmentName)) return;
+                state.collectedFragments.push(fragmentName);
+                // Hide the fragment element
+                const el = document.querySelector(`.hidden-fragment[data-fragment="${fragmentName}"]`);
+                if (el) {
+                    el.classList.add('collected');
+                    setTimeout(() => { el.style.display = 'none'; }, 450);
+                }
+                // Show toast
+                const fragmentLabels = {
+                    'folded-letter': 'Memory Fragment: A Folded Letter',
+                    'moth': 'Memory Fragment: Moth at the Window',
+                    'bird-feather': 'Memory Fragment: Bird Feather',
+                    'pressed-flower': 'Memory Fragment: Pressed Marsh Flower',
+                    'candle-stub': 'Memory Fragment: Candle Stub',
+                };
+                const label = fragmentLabels[fragmentName] || 'Memory Fragment Collected';
+                collectionToast.textContent = label;
+                collectionToast.classList.add('show');
+                setTimeout(() => collectionToast.classList.remove('show'), 2200);
+            }
+
+            // Attach click handlers to fragments
+            allFragmentEls.forEach(el => {
+                el.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    collectFragment(this.dataset.fragment);
+                });
+                el.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    collectFragment(this.dataset.fragment);
+                });
+            });
+
+            // ── ACT I ──
+            function advanceAct1() {
+                if (state.currentPhase !== 'phase-act1' || state.isTransitioning) return;
+                if (state.subIndex < totalAct1Lines) {
+                    if (act1Lines[state.subIndex]) act1Lines[state.subIndex].classList.add('visible');
+                    state.subIndex++;
+                    if (state.subIndex >= totalAct1Lines) {
+                        setTimeout(() => hintAct1.classList.add('show'), 500);
+                    }
+                } else if (state.subIndex >= totalAct1Lines) {
+                    transitionToAct2();
+                }
+            }
+            async function transitionToAct2() {
+                state.isTransitioning = true;
+                hintAct1.classList.remove('show');
+                await fadeToBlack(900);
+                setBackground('#05071c', 1, 0.28, 0.04);
+                activatePhase(phaseAct2);
+                state.subIndex = 0;
+                act2Elements.forEach(el => el.classList.remove('visible'));
+                hintAct2.classList.remove('show');
+                showFragmentElsForPhase('phase-act2');
+                await fadeFromBlack(1050);
+                setTimeout(() => advanceAct2(), 450);
+                state.isTransitioning = false;
+            }
+
+            // ── ACT II ──
+            function advanceAct2() {
+                if (state.currentPhase !== 'phase-act2' || state.isTransitioning) return;
+                if (state.subIndex < totalAct2Elements) {
+                    if (act2Elements[state.subIndex]) act2Elements[state.subIndex].classList.add('visible');
+                    state.subIndex++;
+                    if (state.subIndex >= totalAct2Elements) {
+                        setTimeout(() => hintAct2.classList.add('show'), 500);
+                    }
+                } else if (state.subIndex >= totalAct2Elements) {
+                    transitionToAct3();
+                }
+            }
+            async function transitionToAct3() {
+                state.isTransitioning = true;
+                hintAct2.classList.remove('show');
+                await fadeToBlack(1000);
+                setBackground('#070913', 1, 0.26, 0.05);
+                activatePhase(phaseAct3);
+                state.subIndex = 0;
+                state.act3Stage = 'narrative1';
+                state.act3LinesShown = 0;
+                state.dm1Resolved = false;
+                state.dm2Resolved = false;
+                act3NarrativeLines.forEach(el => el.classList.remove('visible'));
+                dm1Container.style.display = 'none';
+                dm1LucLine.classList.remove('visible');
+                dm1Choices.classList.remove('visible');
+                dm1LucResponse.style.display = 'none';
+                dm1LucResponse.classList.remove('visible');
+                dm2Container.style.display = 'none';
+                dm2LucLine.classList.remove('visible');
+                dm2Choices.classList.remove('visible');
+                dm2LucResponse.style.display = 'none';
+                dm2LucResponse.classList.remove('visible');
+                hintAct3.classList.remove('show');
+                showFragmentElsForPhase('phase-act3');
+                await fadeFromBlack(1100);
+                setTimeout(() => advanceAct3(), 400);
+                state.isTransitioning = false;
+            }
+
+            // ── ACT III ──
+            function advanceAct3() {
+                if (state.currentPhase !== 'phase-act3' || state.isTransitioning) return;
+                const stage = state.act3Stage;
+                if (stage === 'narrative1') {
+                    if (state.act3LinesShown < 7) {
+                        if (act3NarrativeLines[state.act3LinesShown]) act3NarrativeLines[state.act3LinesShown]
+                            .classList.add('visible');
+                        state.act3LinesShown++;
+                    }
+                    if (state.act3LinesShown >= 7) {
+                        state.act3Stage = 'dialogue1';
+                        setTimeout(() => showDialogueMoment1(), 600);
+                    }
+                } else if (stage === 'narrative2') {
+                    if (state.act3LinesShown < 10) {
+                        if (act3NarrativeLines[state.act3LinesShown]) act3NarrativeLines[state.act3LinesShown]
+                            .classList.add('visible');
+                        state.act3LinesShown++;
+                    }
+                    if (state.act3LinesShown >= 10) {
+                        state.act3Stage = 'dialogue2';
+                        setTimeout(() => showDialogueMoment2(), 600);
+                    }
+                } else if (stage === 'narrative3') {
+                    if (state.act3LinesShown < 13) {
+                        if (act3NarrativeLines[state.act3LinesShown]) act3NarrativeLines[state.act3LinesShown]
+                            .classList.add('visible');
+                        state.act3LinesShown++;
+                    }
+                    if (state.act3LinesShown >= 13) {
+                        setTimeout(() => hintAct3.classList.add('show'), 500);
+                        state.act3Stage = 'complete';
+                    }
+                } else if (stage === 'complete') {
+                    transitionToAct4();
+                }
+            }
+
+            function showDialogueMoment1() {
+                dm1Container.style.display = 'flex';
+                setTimeout(() => dm1LucLine.classList.add('visible'), 200);
+                setTimeout(() => dm1Choices.classList.add('visible'), 700);
+            }
+
+            function resolveDialogueMoment1(choice) {
+                if (state.dm1Resolved) return;
+                state.dm1Resolved = true;
+                state.emotionalTone.push(choice);
+                dm1Choices.classList.remove('visible');
+                dm1Choices.style.pointerEvents = 'none';
+                let response = '';
+                if (choice === 'resistance') {
+                    response =
+                        '&ldquo;You already chose this before I arrived. The cage was yours — I only opened the door.&rdquo;';
+                    dm1LucResponse.className = 'dialogue-line luc luc-cold';
+                } else if (choice === 'reflection') {
+                    response =
+                        '&ldquo;Freedom and imprisonment can wear the same face. You are only now learning to tell them apart.&rdquo;';
+                    dm1LucResponse.className = 'dialogue-line luc';
+                } else if (choice === 'surrender') {
+                    response =
+                        '&ldquo;Then you are finally honest with what you are becoming. That takes more courage than running ever did.&rdquo;';
+                    dm1LucResponse.className = 'dialogue-line luc luc-intimate';
+                }
+                dm1LucResponse.innerHTML = response;
+                dm1LucResponse.style.display = 'block';
+                setTimeout(() => dm1LucResponse.classList.add('visible'), 300);
+                setTimeout(() => {
+                    dm1Container.style.display = 'none';
+                    dm1LucLine.classList.remove('visible');
+                    dm1LucResponse.classList.remove('visible');
+                    dm1LucResponse.style.display = 'none';
+                    dm1Choices.style.pointerEvents = 'auto';
+                    state.act3Stage = 'narrative2';
+                    state.act3LinesShown = 7;
+                    advanceAct3();
+                }, 2800);
+            }
+
+            function showDialogueMoment2() {
+                dm2Container.style.display = 'flex';
+                setTimeout(() => dm2LucLine.classList.add('visible'), 200);
+                setTimeout(() => dm2Choices.classList.add('visible'), 700);
+            }
+
+            function resolveDialogueMoment2(choice) {
+                if (state.dm2Resolved) return;
+                state.dm2Resolved = true;
+                state.emotionalTone.push(choice);
+                dm2Choices.classList.remove('visible');
+                dm2Choices.style.pointerEvents = 'none';
+                let response = '';
+                if (choice === 'resistance') {
+                    response =
+                        '&ldquo;No. But I witness you. And in this existence, that is the only currency that holds weight.&rdquo;';
+                    dm2LucResponse.className = 'dialogue-line luc luc-cold';
+                } else if (choice === 'reflection') {
+                    response =
+                        '&ldquo;After enough time, the distinction blurs. But I have never looked away — and that is its own kind of truth.&rdquo;';
+                    dm2LucResponse.className = 'dialogue-line luc';
+                } else if (choice === 'surrender') {
+                    response =
+                        '&ldquo;I have watched you for longer than any mortal span. If that is not love, then love is a poor word for what I feel.&rdquo;';
+                    dm2LucResponse.className = 'dialogue-line luc luc-intimate';
+                }
+                dm2LucResponse.innerHTML = response;
+                dm2LucResponse.style.display = 'block';
+                setTimeout(() => dm2LucResponse.classList.add('visible'), 300);
+                setTimeout(() => {
+                    dm2Container.style.display = 'none';
+                    dm2LucLine.classList.remove('visible');
+                    dm2LucResponse.classList.remove('visible');
+                    dm2LucResponse.style.display = 'none';
+                    dm2Choices.style.pointerEvents = 'auto';
+                    state.act3Stage = 'narrative3';
+                    state.act3LinesShown = 10;
+                    advanceAct3();
+                }, 3000);
+            }
+
+            // ── ACT IV ──
+            async function transitionToAct4() {
+                state.isTransitioning = true;
+                hintAct3.classList.remove('show');
+                await fadeToBlack(1000);
+                setBackground('#0d0a05', 0.85, 0.38, 0.05);
+                activatePhase(phaseAct4);
+                state.subIndex = 0;
+                act4Elements.forEach(el => el.classList.remove('visible'));
+                resolutionText.classList.remove('visible');
+                showFragmentElsForPhase('phase-act4');
+                await fadeFromBlack(1100);
+                advanceAct4Auto();
+                state.isTransitioning = false;
+            }
+            async function advanceAct4Auto() {
+                for (let i = 0; i < totalAct4Elements; i++) {
+                    if (state.currentPhase !== 'phase-act4') return;
+                    await new Promise(r => setTimeout(r, 1450));
+                    if (act4Elements[i]) act4Elements[i].classList.add('visible');
+                }
+                await new Promise(r => setTimeout(r, 1800));
+                if (state.currentPhase === 'phase-act4') {
+                    resolutionText.classList.add('visible');
+                    setTimeout(() => {
+                        if (state.currentPhase === 'phase-act4' && !state.isTransitioning) transitionToAct5();
+                    }, 4000);
+                }
+            }
+
+            // ── ACT V ──
+            async function transitionToAct5() {
+                state.isTransitioning = true;
+                resolutionText.classList.remove('visible');
+                await fadeToBlack(1000);
+                setBackground('#eae7e1', 0, 0, 0);
+                activatePhase(phaseAct5);
+                contradictionText.classList.remove('visible');
+                contradictionSub.classList.remove('visible');
+                allFragmentEls.forEach(el => { el.style.display = 'none'; });
+                await fadeFromBlack(900);
+                setTimeout(() => contradictionText.classList.add('visible'), 400);
+                setTimeout(() => contradictionSub.classList.add('visible'), 1400);
+                setTimeout(() => {
+                    if (state.currentPhase === 'phase-act5' && !state.isTransitioning) transitionToEpilogue();
+                }, 4500);
+                state.isTransitioning = false;
+            }
+
+            // ── EPILOGUE ──
+            async function transitionToEpilogue() {
+                state.isTransitioning = true;
+                contradictionText.classList.remove('visible');
+                contradictionSub.classList.remove('visible');
+                await fadeToBlack(900);
+                setBackground('#0b0b17', 1, 0.28, 0.03);
+                activatePhase(phaseEpilogue);
+                searchLabel.classList.remove('visible');
+                searchWrapper.classList.remove('visible');
+                searchResult.classList.remove('visible', 'no-result', 'found');
+                searchResult.innerHTML = '';
+                syncLine.classList.remove('visible');
+                syncLine.textContent = '';
+                museumLink.classList.remove('visible');
+                searchInput.value = '';
+                state.searchUsed = false;
+                state.storyComplete = true;
+                allFragmentEls.forEach(el => { el.style.display = 'none'; });
+                await fadeFromBlack(1000);
+                setTimeout(() => searchLabel.classList.add('visible'), 300);
+                setTimeout(() => {
+                    searchWrapper.classList.add('visible');
+                    searchInput.focus();
+                }, 900);
+                state.isTransitioning = false;
+            }
+
+            function handleSearch(query) {
+                if (!query || state.searchUsed) return;
+                const trimmed = query.trim();
+                const normalized = trimmed.replace(/\s+/g, ' ').toLowerCase();
+                searchResult.classList.remove('visible', 'no-result', 'found');
+                syncLine.classList.remove('visible');
+                syncLine.textContent = '';
+                museumLink.classList.remove('visible');
+                setTimeout(() => {
+                    if (normalized === 'addie larue' || normalized === 'addie la rue') {
+                        const hasOpenness = state.emotionalTone.some(t => t === 'surrender' || t ===
+                            'reflection');
+                        const hasResistance = state.emotionalTone.some(t => t === 'resistance');
+                        if (hasOpenness || state.emotionalTone.length === 0) {
+                            searchResult.className = 'search-result found';
+                            searchResult.innerHTML = `
+                                <div class="result-card">
+                                    <div class="result-name">Addie LaRue</div>
+                                    <div class="result-status">Status: Found · Exists in memory</div>
+                                    <div class="result-line">A record of her existence has been restored.</div>
+                                </div>`;
+                        } else if (hasResistance && !hasOpenness) {
+                            searchResult.className = 'search-result found';
+                            searchResult.innerHTML = `
+                                <div class="result-card">
+                                    <div class="result-name">Addie LaRue</div>
+                                    <div class="result-status">Status: Unstable · Partial match</div>
+                                    <div class="result-line">Entry recovered from memory archive — but the record wavers, as if uncertain of itself.</div>
+                                </div>`;
+                        }
+                        searchResult.classList.add('visible');
+                        state.searchUsed = true;
+                        setTimeout(() => {
+                            syncLine.textContent = hasOpenness || state.emotionalTone.length === 0 ?
+                                'Memory synchronization complete.' :
+                                'Memory synchronization incomplete.';
+                            syncLine.classList.add('visible');
+                        }, 1800);
+                        // Show museum link after search
+                        setTimeout(() => {
+                            museumLink.classList.add('visible');
+                        }, 2600);
+                    } else if (trimmed.length > 0) {
+                        searchResult.className = 'search-result no-result';
+                        searchResult.textContent = 'No records match your search.';
+                        searchResult.classList.add('visible');
+                        setTimeout(() => museumLink.classList.add('visible'), 1500);
+                    } else {
+                        searchResult.className = 'search-result no-result';
+                        searchResult.textContent = 'Enter a name to search.';
+                        searchResult.classList.add('visible');
+                    }
+                }, 350);
+            }
+
+            // ── MUSEUM SYSTEM ──
+            function buildMuseumArtifacts() {
+                const hasResistance = state.emotionalTone.some(t => t === 'resistance');
+                const hasSurrender = state.emotionalTone.some(t => t === 'surrender');
+                const hasReflection = state.emotionalTone.some(t => t === 'reflection');
+                const hasOpenness = hasSurrender || hasReflection;
+                const foundRecord = hasOpenness || state.emotionalTone.length === 0;
+                const unstableRecord = hasResistance && !hasOpenness;
+
+                const artifacts = [
+                    { id: 'shell-necklace', emoji: '📿', name: 'Shell Necklace', locked: false,
+                        creator: 'Recovered from the marsh shack, circa unknown',
+                        description: `
+                            <strong>Nothing more than a shell and a piece of rawhide.</strong> But this was never just a necklace.
+                            She made it from a shell Chase Andrews found on the shoreline — the same shoreline where she had walked alone for years before he arrived. She gave it to him after he apologized, after she chose to trust again, after loneliness convinced her that any hand reaching toward her was worth holding.
+                            <br><br>
+                            He wore it around his neck. He promised forever.
+                            <br><br>
+                            Forever lasted until she discovered the engagement. Until she realized she had given her heart to a man who had already promised it elsewhere. The necklace was never found on his body when he died. But decades later, when Kya herself passed, <strong>Tate found it in a small wooden box among her things</strong> — worn smooth by time, the rawhide darkened by fingers that had held it in the dark.
+                            <br><br>
+                            She had taken her love back. She had taken her innocence back. And she had kept it, quietly, for the rest of her life.` },
+                    { id: 'pressed-flower', emoji: '🥀', name: 'Pressed Marsh Flower', locked: !state.collectedFragments
+                            .includes('pressed-flower'),
+                        creator: 'Pressed between the pages of a book, date unknown',
+                        description: `
+                            <strong>A single marsh rose, pressed flat by centuries of waiting.</strong> This flower was picked on the night she ran — the night the betrothal ceremony loomed and the air smelled of lavender and damp earth. She tucked it into her sleeve as she fled, and by morning it had wilted against her skin.
+                            <br><br>
+                            She kept it. For three hundred years, she kept it.
+                            <br><br>
+                            It is the only object that traveled with her across every forgotten decade. The petals are brittle now, the color leached to a pale amber. But if you hold it close, you can still smell the marsh — the salt, the mud, the wild impossible green of a place that asked nothing of her and took everything anyway.
+                            <br><br>
+                            <strong>This flower is proof that the night she ran was real.</strong> Even if no record says so.` },
+                    { id: 'bird-feather', emoji: '🪶', name: 'Heron Feather', locked: !state.collectedFragments.includes(
+                            'bird-feather'),
+                        creator: 'Found near the marsh, identified as Ardea herodias',
+                        description: `
+                            <strong>The birds were her only constant companions.</strong> When her mother left, the gulls remained. When her siblings vanished one by one, the herons still stalked the shallows. When her father disappeared without a word, the eagles still circled overhead.
+                            <br><br>
+                            She fed them before she fed herself. She learned their language before she learned to trust human speech again. The great blue heron — solitary, patient, fiercely independent — became her emblem. The townsfolk called her "Marsh Girl" as an insult, but <strong>the heron never needed anyone to validate its existence</strong>. It simply stood in the water and waited for the world to make sense.
+                            <br><br>
+                            This feather was collected near her shack. It is in pristine condition, as though it fell only yesterday. But the truth is that it may be decades old — time works differently in the marsh, and things that should decay sometimes simply… remain.` },
+                    { id: 'candle-stub', emoji: '🕯️', name: 'Candle Stub', locked: !state.collectedFragments.includes(
+                            'candle-stub'),
+                        creator: 'Wax residue dated to multiple time periods — inconclusive',
+                        description: `
+                            <strong>This candle burned for three centuries. Or maybe three minutes.</strong> Time forgot her, so she forgot time. She would light a candle each evening — a small ritual, a way of marking that another day had passed even if no one else could confirm it. The wax pooled and hardened, layer upon layer, until the stub became a geological record of solitude.
+                            <br><br>
+                            There are traces of at least seven different wax compositions in this single stub — beeswax from the 18th century, tallow from the 19th, paraffin from the 20th. <strong>She kept adding to it.</strong> She couldn't bear to let it burn out completely, because then what would mark the passage of her days?
+                            <br><br>
+                            When examined under ultraviolet light, the wax reveals faint fingerprints — hers, presumably. They are the only physical trace of her existence in the entire archive.` },
+                    { id: 'folded-letter', emoji: '✉️', name: 'Folded Letter', locked: !state.collectedFragments.includes(
+                            'folded-letter'),
+                        creator: 'Unsigned, undelivered, found folded into a tiny square',
+                        description: `
+                            <strong>She wrote letters she could never send.</strong> To her mother, who left first. To Jodie, her favorite brother, who promised to return and never did. To Tate, during the years he was gone at college. To herself, on the darkest nights when even the marsh felt like a prison.
+                            <br><br>
+                            This letter is addressed to no one. The ink is faded, the paper brittle at the creases. It reads, in part: <em>"I am still here. I do not know why that matters to me, but it does. I am still here, and I am still me, even if no one can hold that fact in their mind for longer than a breath."</em>
+                            <br><br>
+                            <strong>She wrote herself into existence.</strong> When the world refused to remember her, she remembered herself — on paper, in ink, in words that would outlast any single witness.` },
+                    { id: 'broken-mirror', emoji: '🪞', name: 'Mirror Fragment',
+                        locked: false,
+                        creator: 'Shattered glass, origin unknown',
+                        description: hasResistance ?
+                            `<strong>She broke every mirror that forgot her.</strong> Or so the story goes. In truth, she only broke one — a small hand mirror she had carried since girlhood. One night, after a decade of being unseen, she looked into it and saw nothing. Not because she had no reflection, but because she could no longer recognize the face staring back.
+                            <br><br>
+                            <strong>She shattered it against the floor of the shack.</strong> The pieces scattered across the wooden planks like frozen water. She left them there for years — a reminder that even her own image could not be trusted to remember her.
+                            <br><br>
+                            This fragment is one of those pieces. It still reflects light, but the image it returns is warped, uncertain. Much like the records that claim she never existed at all.` :
+                            `<strong>She kept a mirror for three hundred years.</strong> Not out of vanity — out of necessity. When the world forgot her face, she needed to remember it herself. Each morning she would look into the glass and whisper her own name, as if to anchor herself to the reflection.
+                            <br><br>
+                            The mirror cracked once, during a storm that shook the shack to its foundations. She repaired it with resin and patience, the way she repaired everything in her life. The crack is still visible — a silver line bisecting the glass — but it holds.
+                            <br><br>
+                            <strong>This mirror is the only object that has witnessed her entire existence</strong>, from the night she ran to the morning she finally was remembered. It has never forgotten her face.` },
+                    { id: 'search-card', emoji: '📇', name: 'Search Record Card',
+                        locked: !state.searchUsed,
+                        creator: 'Generated by memory archive terminal',
+                        description: foundRecord ?
+                            `<strong>Name: Addie LaRue<br>Status: Found · Exists in memory</strong><br><br>
+                            A record of her existence has been restored. The search returned a match — against all odds, against the architecture of the system itself. Somewhere in the depths of the archive, a fragment of her name survived.
+                            <br><br>
+                            <strong>She is remembered.</strong> Not fully. Not permanently. But in this moment, in this record, she exists. The system acknowledges what the world once refused to hold.
+                            <br><br>
+                            This card is the only documentation that confirms her presence in the historical register. Whether it will persist — whether any record of her can persist — remains uncertain. But for now, she is real.` :
+                            unstableRecord ?
+                            `<strong>Name: Addie LaRue<br>Status: Unstable · Partial match</strong><br><br>
+                            The search returned something — a flicker, a ghost of a record. The archive seems uncertain, as if it remembers and forgets simultaneously. The entry wavers when you look at it directly.
+                            <br><br>
+                            <strong>She exists in the gap between acknowledgement and erasure.</strong> The system cannot confirm her, but it also cannot definitively deny her. Perhaps that is the most honest record of all — an existence that resists categorization, a life that refuses to be either fully remembered or fully forgotten.` :
+                            `<strong>No record found for: Addie LaRue.</strong><br><br>
+                            The archive contains no entry matching this name. No birth record, no death record, no documented presence in any official registry. It is as though she never existed at all.
+                            <br><br>
+                            <strong>But absence is not the same as falsehood.</strong> The archive can only record what the world agreed to remember — and the world agreed to forget her. This empty result is itself a kind of testimony: proof that memory is not a neutral act, but a choice made by those who hold power over the record.
+                            <br><br>
+                            She was here. This card, blank as it is, will serve as evidence that someone searched for her.` },
+                ];
+                return artifacts;
+            }
+
+            function renderMuseum() {
+                const artifacts = buildMuseumArtifacts();
+                museumGrid.innerHTML = '';
+                artifacts.forEach(art => {
+                    const div = document.createElement('div');
+                    div.className = 'museum-artifact' + (art.locked ? ' locked' : '');
+                    div.innerHTML = `
+                        <span class="artifact-emoji">${art.emoji}</span>
+                        <span class="artifact-name">${art.locked ? '???' : art.name}</span>
+                    `;
+                    if (!art.locked) {
+                        div.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            showArtifactDetail(art);
+                        });
+                        div.addEventListener('touchstart', (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            showArtifactDetail(art);
+                        });
+                    }
+                    museumGrid.appendChild(div);
+                });
+            }
+
+            function showArtifactDetail(artifact) {
+                detailEmoji.textContent = artifact.emoji;
+                detailTitle.textContent = artifact.name;
+                detailCreator.textContent = artifact.creator;
+                detailDescription.innerHTML = artifact.description;
+                artifactDetailOverlay.classList.add('visible');
+            }
+
+            function hideArtifactDetail() {
+                artifactDetailOverlay.classList.remove('visible');
+            }
+
+            function openMuseum() {
+                renderMuseum();
+                museumPhase.classList.add('active');
+                state.museumOpen = true;
+                museumPhase.scrollTop = 0;
+            }
+
+            function closeMuseum() {
+                museumPhase.classList.remove('active');
+                state.museumOpen = false;
+            }
+
+            // ── EVENT LISTENERS ──
+            document.addEventListener('click', function(e) {
+                if (e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT' || e.target.closest('button') ||
+                    e.target.closest('input') || e.target.closest('.museum-artifact') || e.target.closest(
+                        '#artifact-detail-overlay') || e.target.closest('.hidden-fragment') || e.target.closest(
+                        '#museum-link') || e.target.closest('#return-from-museum')) return;
+
+                if (state.museumOpen) return;
+                if (state.currentPhase === 'phase-act1') advanceAct1();
+                else if (state.currentPhase === 'phase-act2') advanceAct2();
+                else if (state.currentPhase === 'phase-act3') advanceAct3();
+            });
+
+            document.addEventListener('keydown', function(e) {
+                if (e.target === searchInput && e.key === 'Enter') {
+                    e.preventDefault();
+                    handleSearch(searchInput.value);
+                    return;
+                }
+                if (e.target.tagName === 'INPUT') return;
+                if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    if (state.museumOpen) return;
+                    if (state.currentPhase === 'phase-act1') advanceAct1();
+                    else if (state.currentPhase === 'phase-act2') advanceAct2();
+                    else if (state.currentPhase === 'phase-act3') advanceAct3();
+                }
+            });
+
+            // Dialogue choice buttons
+            dm1Choices.querySelectorAll('.choice-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    resolveDialogueMoment1(this.dataset.choice);
+                });
+                btn.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    resolveDialogueMoment1(this.dataset.choice);
+                });
+            });
+            dm2Choices.querySelectorAll('.choice-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    resolveDialogueMoment2(this.dataset.choice);
+                });
+                btn.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    resolveDialogueMoment2(this.dataset.choice);
+                });
+            });
+
+            // Search
+            searchInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleSearch(searchInput.value);
+                }
+            });
+            searchInput.addEventListener('blur', function() {
+                const val = searchInput.value.trim();
+                if (val && !state.searchUsed) {
+                    setTimeout(() => {
+                        if (!state.searchUsed && searchInput.value.trim() === val) handleSearch(val);
+                    }, 200);
+                }
+            });
+
+            // Museum link
+            museumLink.addEventListener('click', function(e) {
+                e.stopPropagation();
+                e.preventDefault();
+                openMuseum();
+            });
+            museumLink.addEventListener('touchstart', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                openMuseum();
+            });
+            returnFromMuseum.addEventListener('click', function(e) {
+                e.stopPropagation();
+                e.preventDefault();
+                closeMuseum();
+            });
+            returnFromMuseum.addEventListener('touchstart', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                closeMuseum();
+            });
+
+            // Artifact detail overlay
+            closeDetailBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                hideArtifactDetail();
+            });
+            artifactDetailOverlay.addEventListener('click', function(e) {
+                if (e.target === artifactDetailOverlay) hideArtifactDetail();
+            });
+
+            // ── INIT ──
+            async function init() {
+                setBackground('#0e0b07', 1, 0.32, 0.05);
+                activatePhase(phaseAct1);
+                state.subIndex = 0;
+                act1Lines.forEach(el => el.classList.remove('visible'));
+                hintAct1.classList.remove('show');
+                allFragmentEls.forEach(el => { el.style.display = 'none';
+                    el.classList.remove('collected'); });
+                showFragmentElsForPhase('phase-act1');
+                await new Promise(r => setTimeout(r, 700));
+                advanceAct1();
+            }
+            init();
+
+            console.log('%c🌑 SHE IS REMEMBERED %c— Memory Museum Edition',
+                'color: #c8a860; font-size: 1.2em; font-family: "IM Fell English", Georgia, serif;',
+                'color: #888;');
+            console.log('%cClick or press any key to advance. Look for hidden fragments throughout the story.',
+                'color: #aaa; font-style: italic;');
+            console.log('%cAfter the search epilogue, enter the Memory Museum to explore your collected artifacts.',
+                'color: #aaa; font-style: italic;');
+        })();
+    </script>
+</body>
+</html>
